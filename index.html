@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI2ORBIT - NetSwitch Industry</title>
+<meta name="description" content="NetSwitch Industry: an industrial HMI that connects to the network and reads the apparatus, a measured tool set behind it, a PROFIBUS and PROFINET add-on, and a playable football engine.">
+<!--
+  index.html - AI2ORBIT / NetSwitch Industry
+  Copyright (c) AI2ORBIT Co. 2026
+
+  ONE FILE, NO EXTERNAL REQUESTS. No web font, no analytics, no CDN, no framework. Everything
+  it needs is in this folder, which is what lets it be dropped on any host, embedded inside a
+  Google Sites page, or opened from a memory stick at a stand with no network.
+
+  NO LOGO ARTWORK IS USED HERE, AND THAT IS DELIBERATE. The AI2ORBIT wordmark and the
+  Avainlippu are export marks with rules attached - they are shipped at their native
+  proportions, scaled and never redrawn, recoloured or recropped. Setting a wordmark in a web
+  font would be redrawing it. So the name is plain text until the real asset is dropped into
+  img/ and swapped in at the marked line below, and no Avainlippu appears on this page at all.
+
+  Every screenshot in img/ is of the real thing, taken at 1280x720 from the running product.
+  None of them is a mockup, and nothing in them has been retouched. The one edit made was to
+  hide the "opened outside the app" development banner on the HMI screen, which is a note to
+  a developer and not part of the product.
+-->
+<style>
+  :root{
+    --ink:#12212f; --dim:#5b6b7b; --line:#dde3ea; --bg:#fff; --soft:#f5f7f9;
+    --accent:#1f6feb; --accent-soft:#eaf1fd;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    font:16px/1.55 -apple-system,"Segoe UI",system-ui,Roboto,Arial,sans-serif;
+    color:var(--ink); background:var(--bg);
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);padding:26px 0 22px}
+  .mark{font-size:26px;font-weight:800;letter-spacing:.06em}
+  .mark span{color:var(--accent)}
+  .tag{color:var(--dim);font-size:14px;margin-top:4px;letter-spacing:.02em}
+  nav{margin-top:18px;display:flex;flex-wrap:wrap;gap:8px}
+  nav a{
+    font-size:13px;font-weight:600;text-decoration:none;color:var(--ink);
+    border:1px solid var(--line);border-radius:999px;padding:6px 13px;
+  }
+  nav a:hover{border-color:var(--accent);color:var(--accent)}
+
+  .lede{padding:38px 0 8px;max-width:760px}
+  .lede h1{font-size:30px;line-height:1.25;font-weight:800;letter-spacing:-.01em}
+  .lede p{margin-top:14px;color:var(--dim);font-size:17px}
+
+  section{padding:38px 0;border-top:1px solid var(--line)}
+  section:first-of-type{border-top:0}
+  h2{font-size:21px;font-weight:800;letter-spacing:-.01em}
+  h2 small{display:block;font-size:12px;font-weight:700;color:var(--accent);
+           letter-spacing:.14em;text-transform:uppercase;margin-bottom:7px}
+  .body{max-width:760px;margin-top:12px}
+  .body p{margin-top:11px;color:#3c4a58}
+  ul{margin-top:12px;padding-left:18px;color:#3c4a58;max-width:760px}
+  li{margin-top:6px}
+
+  figure{margin-top:22px}
+  figure img{
+    display:block;width:100%;height:auto;
+    border:1px solid var(--line);border-radius:10px;background:var(--soft);
+  }
+  figcaption{margin-top:9px;font-size:13px;color:var(--dim)}
+
+  .stats{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+  .stat{border:1px solid var(--line);border-radius:9px;padding:11px 15px;min-width:104px}
+  .stat b{display:block;font-size:21px;font-weight:800;letter-spacing:-.01em}
+  .stat span{font-size:12px;color:var(--dim)}
+
+  .cta{
+    display:inline-block;margin-top:20px;background:var(--accent);color:#fff;
+    text-decoration:none;font-weight:700;font-size:14px;padding:11px 20px;border-radius:8px;
+  }
+  .cta:hover{filter:brightness(1.08)}
+  .cta.ghost{background:var(--accent-soft);color:var(--accent)}
+
+  /* A report block is real output. It is monospaced and it scrolls sideways on a phone
+     rather than reflowing, because a table that reflows stops being a table. */
+  pre{
+    margin-top:20px;background:#0f1926;color:#d7e2ee;border-radius:10px;
+    padding:16px 18px;overflow-x:auto;font:13px/1.45 ui-monospace,Menlo,Consolas,monospace;
+  }
+  pre b{color:#8fc3ff;font-weight:600}
+
+  footer{border-top:1px solid var(--line);padding:26px 0 46px;color:var(--dim);font-size:13px}
+  footer p{margin-top:7px}
+  .note{background:var(--soft);border-left:3px solid var(--accent);padding:12px 15px;
+        border-radius:0 7px 7px 0;margin-top:20px;font-size:14px;color:#3c4a58;max-width:760px}
+
+  @media (max-width:640px){
+    .lede h1{font-size:24px}
+    .lede p{font-size:15px}
+    .mark{font-size:22px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <!-- SWAP HERE. Replace this line with <img src="img/wordmark.png" alt="AI2ORBIT">
+         once the real wordmark file is in img/. Scale it, do not redraw it. -->
+    <div class="mark">AI2<span>ORBIT</span></div>
+    <div class="tag">NetSwitch Industry &middot; industrial HMI, network tooling and fieldbus</div>
+    <nav>
+      <a href="#netswitch">NetSwitch Industry</a>
+      <a href="#tools">The tool set</a>
+      <a href="#profibus">PROFIBUS add-on</a>
+      <a href="#football">Football engine</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="lede">
+    <h1>Instruments, not dashboards.</h1>
+    <p>
+      Every figure on these screens says where it came from - measured on this device,
+      supplied by a datasheet, modelled, or not stated at all. A number with no provenance
+      beside it is the ordinary way a monitoring product misleads the person reading it, and
+      it is the one thing none of this does.
+    </p>
+  </div>
+
+  <section id="netswitch">
+    <h2><small>The product</small>NetSwitch Industry</h2>
+    <div class="body">
+      <p>
+        One screen that connects to the network and reads the apparatus. NFC and QR at
+        13.56&nbsp;MHz, the radios, the meters and the standards reports, on a phone in a
+        plant room or on a desktop in an office. The same HTML runs on Android, on iOS and in
+        a browser.
+      </p>
+      <p>
+        The tiles are marked. <b>COUNTED</b> means a real count kept by the page - every byte
+        that passed through the reader. <b>PLANT SIM</b> means no plant is attached and the
+        figure is driving the display rather than reporting anything. A tile that is
+        decoration is harmless until somebody reads it as an instrument, so the two are never
+        allowed to look alike.
+      </p>
+    </div>
+    <figure>
+      <img src="img/hmi.png" alt="The NetSwitch Industry HMI: NFC reader, storage, NFC writer, cumulative meters and the upscale panel." loading="lazy" width="1280" height="720">
+      <figcaption>The HMI, running. Every measured tile carries its own label.</figcaption>
+    </figure>
+  </section>
+
+  <section id="tools">
+    <h2><small>Behind it</small>The tool set</h2>
+    <div class="body">
+      <p>
+        The HMI sits on top of a set of command line tools, each of which answers one question
+        with arithmetic and says plainly what it did not measure. They build on Linux, Windows
+        and Android from a single source file each, with no libraries to install.
+      </p>
+      <p>
+        Most of them check themselves. Several are then checked again from outside, by a
+        second program in a second language, so that a suite and the code it tests do not
+        share one author's assumptions.
+      </p>
+    </div>
+    <div class="stats">
+      <div class="stat"><b>58</b><span>tools</span></div>
+      <div class="stat"><b>384</b><span>menu items</span></div>
+      <div class="stat"><b>54</b><span>with a selftest</span></div>
+      <div class="stat"><b>34</b><span>with a platform matrix</span></div>
+      <div class="stat"><b>82,688</b><span>lines of source</span></div>
+    </div>
+    <figure>
+      <img src="img/menu.png" alt="The menu: every tool and the app in one page, each with what it does and what it is for." loading="lazy" width="1280" height="720">
+      <figcaption>Every tool and the app in one menu, generated from the sources themselves.</figcaption>
+    </figure>
+  </section>
+
+  <section id="profibus">
+    <h2><small>Add-on</small>PROFIBUS and PROFINET</h2>
+    <div class="body">
+      <p>
+        Whether traffic fits on a bus is arithmetic, not opinion. The fieldbus tool answers it
+        for PROFIBUS&nbsp;DP and PROFINET, and starts from a distinction that decides the whole
+        question: the layers a PROFIBUS diagram marks <em>not used</em> are not idle, they are
+        <em>absent</em>. There is no code, no octet on the wire and no share of the bus period
+        set aside for them. There is nothing there to switch on.
+      </p>
+    </div>
+<pre>  layer                <b>PROFIBUS DP</b>      <b>PROFINET</b>
+  --------------------------------------------------------------
+  7 application        DP-V0/V1/V2      CBA, RT, records
+  6 presentation       absent           absent
+  5 session            absent           absent
+  4 transport          absent           TCP and UDP
+  3 network            absent           IPv4
+  2 data link          FDL, token       802.3 MAC, VLAN
+  1 physical           RS485 or MBP     100BASE-TX or FX
+  --------------------------------------------------------------</pre>
+    <div class="body">
+      <p>
+        A stack with no network layer cannot route, so no frame takes a longer path than
+        expected. With no transport layer it cannot segment or retransmit out of band, so no
+        frame arrives late because of an earlier one. What is left is a bus whose worst case
+        period is arithmetic - and that property is the reason the protocol exists.
+      </p>
+      <p>
+        PROFINET is a different answer entirely: Ethernet with a full IP stack already in
+        service. Its real time frames carry ethertype 0x8892 and no IP header, precisely so
+        they never queue behind that stack. Two kinds of traffic share one cable and touch
+        none of the same code.
+      </p>
+    </div>
+  </section>
+
+  <section id="football">
+    <h2><small>Also from the same shop</small>The football engine</h2>
+    <div class="body">
+      <p>
+        Ten outfield players a side plus keepers, all articulated, all driven by the engine.
+        The referee is live and plays the Laws: offside with the whole flag decision, throw
+        ins, corners, goal kicks, free kicks with a wall the referee waits for, penalties,
+        advantage and dropped balls.
+      </p>
+      <p>
+        The rules are a separate module with no renderer in it, and they are tested with no
+        browser present. That is what makes them survive a change of engine - the drawing can
+        be replaced without touching a single Law.
+      </p>
+      <ul>
+        <li>Playable in a browser, keyboard or nothing at all.</li>
+        <li>Attract mode: the engine plays both sides unattended, for a stand.</li>
+        <li>Teams and kits are a data file. Real squads need their own licences.</li>
+      </ul>
+    </div>
+    <figure>
+      <img src="img/football.png" alt="The football engine mid-match: both teams on the pitch, live statistics and the referee's own decision on screen." loading="lazy" width="1280" height="720">
+      <figcaption>Mid-match, with the referee's own decision and the restart counters on screen.</figcaption>
+    </figure>
+    <a class="cta" href="https://anirudhatalmale6-alt.github.io/football-ai-3d/play.html">Play it in the browser</a>
+    <a class="cta ghost" href="https://anirudhatalmale6-alt.github.io/football-ai-3d/demo.html">The demo build</a>
+  </section>
+
+  <section>
+    <h2><small>Enquiries</small>Getting in touch</h2>
+    <div class="note">
+      <!-- PLACEHOLDER. Put the real address and company details here. It is left blank
+           rather than filled in with something plausible. -->
+      Contact details go here - address, company number and enquiry address.
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    <p>AI2ORBIT Co. 2026. NetSwitch Industry.</p>
+    <p>Screens on this page are of the running product, at their native size, unretouched.</p>
+  </div>
+</footer>
+
+</body>
+</html>
