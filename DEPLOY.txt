@@ -1,0 +1,132 @@
+ai2orbit-site - deploying to Cloud Run
+Copyright (c) AI2ORBIT Co. 2026
+
+WHAT THIS IS
+
+  The site, packaged so that Cloud Run can run it. Four files of content
+  and a web server around them. No build step, no framework, nothing to
+  install: what is in this folder is exactly what gets served.
+
+  Project taken from the console link: rising-ethos-287519
+  I cannot sign in to the console, so the commands below are the whole
+  job and they run from a machine that is already signed in.
+
+BEFORE THE FIRST DEPLOY, ONCE
+
+  gcloud config set project rising-ethos-287519
+
+  gcloud services enable run.googleapis.com \
+                         cloudbuild.googleapis.com \
+                         artifactregistry.googleapis.com
+
+  The three are needed together: Cloud Build turns this folder into an
+  image, Artifact Registry stores it, Cloud Run runs it.
+
+DEPLOY
+
+  cd ai2orbit-site
+
+  gcloud run deploy ai2orbit-site \
+      --source . \
+      --region europe-north1 \
+      --allow-unauthenticated \
+      --memory 256Mi \
+      --min-instances 0 \
+      --max-instances 4
+
+  That is the whole thing. It prints a https://ai2orbit-site-....run.app
+  address at the end, and that address is live immediately with a
+  certificate already on it.
+
+  --source . means Docker is NOT needed on the machine running this. The
+  folder is uploaded and built by Cloud Build, which finds the Dockerfile
+  here and uses it.
+
+  REGION. europe-north1 is Hamina, Finland - the closest region, and the
+  one that keeps the data in the country. Any region works; if it is
+  changed, change it in every command below too.
+
+  --min-instances 0 means it scales to nothing when nobody is looking at
+  it, and a site like this sits inside the free monthly allowance in
+  normal use. The first request after an idle period waits about a second
+  for the container to start. Setting it to 1 removes that wait and is
+  the one setting here that costs money continuously.
+
+UPDATING IT
+
+  Same command. Each deploy is a new revision and traffic moves to it as
+  soon as it is healthy; the previous revision stays in the list and can
+  be rolled back to from the console in one click.
+
+  The page is served with Cache-Control: no-cache, so a browser picks up
+  a redeploy at once rather than showing yesterday's copy.
+
+IF THE DEPLOY SUCCEEDS BUT THE PAGE ASKS FOR A LOGIN
+
+  --allow-unauthenticated has to give the run.invoker role to allUsers,
+  and a Workspace organisation very often has a policy in place -
+  iam.allowedPolicyMemberDomains - that refuses to grant anything to a
+  group outside the domain. The deploy still succeeds; the site just
+  answers 403 to everyone outside the company.
+
+  It is a one line refusal in the output, and the fix is a policy
+  exception for this project made by whoever administers the
+  organisation. It is not something wrong with the image.
+
+A CUSTOM DOMAIN
+
+  The run.app address works straight away and needs no DNS at all, so
+  nothing is blocked on this.
+
+  For a real domain there are two routes, and which one applies depends
+  on the project and region - I cannot see the console, so this is NOT
+  STATED rather than a recommendation:
+
+    gcloud beta run domain-mappings create \
+        --service ai2orbit-site --domain www.example.com \
+        --region europe-north1
+
+  is the simple one - it prints the DNS records to add and manages the
+  certificate. It is not offered in every region.
+
+  Where it is not offered, the route that always works is a global
+  external load balancer in front of the service. It is more setup and it
+  has a standing monthly cost, unlike the service itself.
+
+  Either way the domain and the place its DNS is managed are still the
+  two things I need from your side.
+
+EMBEDDING IT IN A GOOGLE SITES PAGE INSTEAD
+
+  Sites will not accept an HTML file, but it will embed a URL. Once this
+  is deployed, "Embed > By URL" with the run.app address puts the page
+  inside a Sites page.
+
+  The content security policy this server sends deliberately allows that
+  embedding - and only from Google. Left at the safe default the embed
+  would have shown an empty box with the reason visible only in a
+  browser console.
+
+CHECKING IT BEFORE OR AFTER
+
+  sh check-container.sh
+
+  Builds the image, runs it, and makes 25 assertions about the running
+  container: that it honours PORT, that the bytes served are the file on
+  disk, that every screenshot arrives whole, that the policy is on the
+  page AND on an image, that a missing path is a 404. It needs podman or
+  docker locally. It is not needed to deploy.
+
+  After a deploy, the same questions against the live address:
+
+    curl -sI https://<address>/            | head -20
+    curl -s  https://<address>/healthz
+
+WHAT IS DELIBERATELY NOT IN THE PAGE
+
+  No logo artwork of any kind, and no Avainlippu. The wordmark is set as
+  plain text with a marked swap line in index.html, because setting a
+  wordmark in a web font is redrawing it. Drop the real asset into img/
+  and change that one line.
+
+  The contact block is blank rather than filled with something plausible.

@@ -1,0 +1,8 @@
+# Files that stay on the machine and never reach the build.
+.git/
+.gitignore
+.gcloudignore
+check-container.sh
+DEPLOY.txt
+*.zip
+*.log

@@ -1,0 +1,53 @@
+# default.conf.template - served by Cloud Run
+# Copyright (c) AI2ORBIT Co. 2026
+#
+# ${PORT} is substituted by the nginx image's own entrypoint before the server starts.
+#
+# Every block that sets a header of its own also includes headers.conf. That repetition is
+# not tidiness - read the note at the top of headers.conf before removing any of it.
+
+server {
+    listen       ${PORT};
+    listen       [::]:${PORT};
+    server_name  _;
+
+    root  /usr/share/nginx/html;
+    index index.html;
+
+    include /etc/nginx/headers.conf;
+
+    gzip              on;
+    gzip_min_length   512;
+    # PNG is already compressed; running it through gzip spends processor time to make the
+    # file marginally bigger, so only the text is listed here.
+    gzip_types        text/html text/css text/plain;
+
+    # The page is redeployed whenever a screen or a figure changes, and a cached copy of
+    # yesterday's page is worse than a fetch. The screenshots are big and change rarely,
+    # so they get an hour.
+    location = / {
+        include /etc/nginx/headers.conf;
+        add_header Cache-Control "no-cache" always;
+        try_files /index.html =404;
+    }
+    location = /index.html {
+        include /etc/nginx/headers.conf;
+        add_header Cache-Control "no-cache" always;
+    }
+    location /img/ {
+        include /etc/nginx/headers.conf;
+        add_header Cache-Control "public, max-age=3600" always;
+    }
+
+    # Cloud Run does not require a health endpoint - it probes the port - but a plain
+    # text 200 is the cheapest way to answer "is the revision actually up" from a script.
+    location = /healthz {
+        access_log off;
+        default_type text/plain;
+        return 200 "ok\n";
+    }
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
